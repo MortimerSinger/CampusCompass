@@ -1,0 +1,11 @@
+:root { --bg:#0b1020; --panel:#121832; --muted:#93a1b1; --accent:#7bdcf2; --ok:#86efac; --warn:#fbbf24;}
+.panel { background: var(--panel); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 16px; }
+.btn { background:#1f2a4a; color:white; border:1px solid rgba(255,255,255,.1); padding:8px 12px; border-radius:8px; cursor:pointer;}
+.input, .select, .textarea { width:100%; background:#0f1530; color:white; border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:10px; }
+.grid { display:grid; gap:12px; }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.table { width:100%; border-collapse: collapse;}
+.table th, .table td { padding:10px; border-bottom: 1px solid rgba(255,255,255,.08); text-align:left;}
+.tag { font-size:12px; padding:2px 8px; border-radius:999px; background:#1b2446; border:1px solid rgba(255,255,255,.08); }
+small.muted { color: var(--muted);}
