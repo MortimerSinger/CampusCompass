@@ -1,6 +1,6 @@
 import pdf from "pdf-parse";
 
-export async function POST(request: Request) {
+export async function POST(request) {
   try {
     const { url } = await request.json();
     if (!url || typeof url !== "string") {
@@ -11,7 +11,8 @@ export async function POST(request: Request) {
     const buff = Buffer.from(await res.arrayBuffer());
     const data = await pdf(buff);
     const text = data.text || "";
-    // Naive extraction: find block around "C7"
+
+    // naive C7 extraction
     const idx = text.indexOf("C7");
     let snippet = "";
     if (idx !== -1) {
@@ -19,7 +20,6 @@ export async function POST(request: Request) {
       const end = Math.min(text.length, idx + 2400);
       snippet = text.substring(start, end);
     } else {
-      // try alternate
       const idx2 = text.toUpperCase().indexOf("C7");
       if (idx2 !== -1) {
         const start = Math.max(0, idx2 - 800);
@@ -27,17 +27,17 @@ export async function POST(request: Request) {
         snippet = text.substring(start, end);
       }
     }
-    // Attempt trivial mapping: look for lines like "Rigor of secondary school record" followed by markers
+
     const factors = [
       "Rigor of secondary school record","Class rank","Academic GPA","Standardized test scores","Application Essay","Recommendation(s)",
       "Interview","Extracurricular activities","Talent/ability","Character/personal qualities","First generation","Alumni/ae relation",
       "Geographical residence","State residency","Religious affiliation/commitment","Racial/ethnic status","Volunteer work",
       "Work experience","Level of applicant’s interest","Level of applicant's interest"
     ];
-    const result = { very_important: [] as string[], important: [] as string[], considered: [] as string[], not_considered: [] as string[] };
+    const result = { very_important: [], important: [], considered: [], not_considered: [] };
     const lines = (snippet || text).split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
 
-    function assignFactor(name: string, line: string) {
+    function assignFactor(name, line) {
       const l = line.toLowerCase();
       if (/(very\s*important|\bvi\b)/i.test(l)) result.very_important.push(name);
       else if (/(\bimportant\b|\bi\b)/i.test(l)) result.important.push(name);
@@ -54,12 +54,12 @@ export async function POST(request: Request) {
       }
     }
 
-    const counts = Object.values(result).reduce((a:any,arr:any)=>a+arr.length,0);
+    const counts = Object.values(result).reduce((a,arr)=>a+arr.length,0);
     if (counts === 0) {
       return Response.json({ status: "unparsed", snippet: snippet || lines.slice(0, 120).join("\n") });
     }
     return Response.json({ status: "ok", c7: result, snippet });
-  } catch (e:any) {
+  } catch (e) {
     return new Response(JSON.stringify({ error: e?.message || "CDS parse failed" }), { status: 500 });
   }
 }
