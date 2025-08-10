@@ -12,7 +12,6 @@ export async function POST(request) {
     const data = await pdf(buff);
     const text = data.text || "";
 
-    // naive C7 extraction
     const idx = text.indexOf("C7");
     let snippet = "";
     if (idx !== -1) {
@@ -49,8 +48,7 @@ export async function POST(request) {
       const ix = lines.findIndex(l => l.toLowerCase().includes(f.toLowerCase()));
       if (ix !== -1) {
         const windowLines = lines.slice(ix, Math.min(ix+3, lines.length));
-        const combo = windowLines.join(" ");
-        assignFactor(f, combo);
+        assignFactor(f, windowLines.join(" "));
       }
     }
 
